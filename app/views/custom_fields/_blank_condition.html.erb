@@ -1,1 +1,2 @@
-<%=build_conditions_form(@custom_field, nil, @custom_field.conditions['rules'].count)%>
+<%= build_conditions_form(@custom_field, nil, @parsed_conditions && @parsed_conditions['rules'] ? @parsed_conditions['rules'].count : 0) %>
+
