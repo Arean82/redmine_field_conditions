@@ -20,6 +20,12 @@ module RedmineFieldConditionsHelper
 		@param_name = "custom_table" if @custom_table
 	end
 
+	def ensure_conditions_initialized
+  		return unless @custom_field
+  		@custom_field.conditions ||= {}
+	end
+
+
 	def build_conditions_form(custom_field, rules, rule_index)
 		set_parameter_name unless @param_name
 
