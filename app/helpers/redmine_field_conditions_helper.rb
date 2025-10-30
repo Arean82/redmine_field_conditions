@@ -22,36 +22,36 @@ module RedmineFieldConditionsHelper
 
 	def ensure_conditions_initialized
 	  return unless @custom_field
-	
+
 	  raw = @custom_field.conditions
-	
-	  # 🔒 Step 1 — Force parse strings into a Ruby hash safely
-	  if raw.is_a?(String)
-	    parsed = nil
-	    begin
-	      unless raw.strip.empty?
-	        parsed = YAML.safe_load(raw, permitted_classes: [Symbol], aliases: true) rescue nil
-	        parsed ||= JSON.parse(raw) rescue nil
+
+	  # Step 1: Normalize any format (String, JSON, YAML, nil)
+	  parsed =
+	    case raw
+	    when Hash
+	      raw
+	    when String
+	      begin
+	        if raw.strip.empty?
+	          {}
+	        else
+	          YAML.safe_load(raw, permitted_classes: [Symbol], aliases: true) rescue JSON.parse(raw) rescue {}
+	        end
+	      rescue StandardError
+	        {}
 	      end
-	    rescue StandardError
-	      parsed = nil
+	    else
+	      {}
 	    end
-	    @custom_field.conditions = parsed.is_a?(Hash) ? parsed : {}
-	  elsif !raw.is_a?(Hash)
-	    # If it's something else (nil, integer, etc.), reset cleanly
-	    @custom_field.conditions = {}
-	  end
-	
-	  # 🔒 Step 2 — Always ensure it's a hash from now on
-	  @custom_field.conditions ||= {}
-	
-	  # 🔒 Step 3 — Initialize expected keys with safe defaults
-	  @custom_field.conditions['enabled'] = !!@custom_field.conditions['enabled']
-	  @custom_field.conditions['expr']    ||= ''
-	  @custom_field.conditions['rules']   = Array(@custom_field.conditions['rules'])
+
+	  # Step 2: Ensure keys and defaults
+	  parsed['enabled'] = !!parsed['enabled']
+	  parsed['expr']    ||= ''
+	  parsed['rules']   = Array(parsed['rules'])
+
+	  # Step 3: Store parsed safely back as a hash (not string)
+	  @parsed_conditions = parsed
 	end
-
-
 
 
 	def build_conditions_form(custom_field, rules, rule_index)
