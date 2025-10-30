@@ -25,25 +25,27 @@ module RedmineFieldConditionsHelper
 	
 	  raw = @custom_field.conditions
 	
-	  # Normalize possible string forms (YAML, JSON, or plain text)
+	  # 🔒 Step 1 — Force parse strings into a Ruby hash safely
 	  if raw.is_a?(String)
+	    parsed = nil
 	    begin
-	      if raw.strip.empty?
-	        parsed = {}
-	      else
+	      unless raw.strip.empty?
 	        parsed = YAML.safe_load(raw, permitted_classes: [Symbol], aliases: true) rescue nil
-	        parsed ||= JSON.parse(raw) rescue {}
+	        parsed ||= JSON.parse(raw) rescue nil
 	      end
-	      @custom_field.conditions = parsed.is_a?(Hash) ? parsed : {}
-	    rescue
-	      @custom_field.conditions = {}
+	    rescue StandardError
+	      parsed = nil
 	    end
+	    @custom_field.conditions = parsed.is_a?(Hash) ? parsed : {}
+	  elsif !raw.is_a?(Hash)
+	    # If it's something else (nil, integer, etc.), reset cleanly
+	    @custom_field.conditions = {}
 	  end
 	
-	  # Ensure it's a hash
+	  # 🔒 Step 2 — Always ensure it's a hash from now on
 	  @custom_field.conditions ||= {}
 	
-	  # Guarantee valid keys with correct defaults
+	  # 🔒 Step 3 — Initialize expected keys with safe defaults
 	  @custom_field.conditions['enabled'] = !!@custom_field.conditions['enabled']
 	  @custom_field.conditions['expr']    ||= ''
 	  @custom_field.conditions['rules']   = Array(@custom_field.conditions['rules'])
