@@ -5,28 +5,26 @@ module RedmineFieldConditions
     module IssuePatch
       def self.included(base)
         base.class_eval do
-          # ✅ Filter visible custom field values based on conditions
-          def visible_custom_field_values(user = nil)
-            values = super(user)
+          # ✅ Works whether Redmine core calls with 0 or 1 argument
+          def visible_custom_field_values(*args)
+            values = super(*args)
             return values if User.current.admin?
 
+            # Filter only the custom fields visible under current conditions
             values.select { |cfv| cfv.custom_field.visible_to?(self) }
           end
 
-          # ✅ Make sure editability doesn’t raise errors if super is missing
-          def editable_custom_field_values(user = nil)
+          # ✅ Prevent editability errors
+          def editable_custom_field_values(*args)
             begin
-              super(user)
+              super(*args)
             rescue NoMethodError
               custom_field_values
             end
           end
 
-          # ✅ Redmine doesn’t define this method, so define it here
-          # This method prevents "super" crashes when required_attribute_names is called
-          def required_attribute_names(user = nil)
-            # Normally Redmine checks each attribute with required_attribute?
-            # This safely returns an empty array to avoid breaking core calls.
+          # ✅ Prevent crashes on required_attribute_names
+          def required_attribute_names(*_args)
             []
           end
         end
