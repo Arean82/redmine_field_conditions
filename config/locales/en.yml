@@ -1,3 +1,17 @@
 # English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  redmine_field_conditions:
+    label_enabled: "Conditions"
+    label_active: "Active"
+    label_rule_name: "Rule name"
+    label_rule_field: "Field"
+    label_rule_op: "Operator"
+    label_rule_val: "Value"
+    label_button_new_rule: "New rule"
+    label_expr: "Expression"
+    validator:
+      uniq_name: "Each rule must have a unique name"
+      blank_name: "Rule name cannot be blank"
+      space_name: "Rule name cannot contain spaces"
+      success: "Conditions saved successfully"
+
