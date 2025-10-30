@@ -1,6 +1,7 @@
 module RedmineFieldConditions
   module Hooks
-    class ConditionsHook < Redmine::Hook::Listener
+   # class ConditionsHook < Redmine::Hook::Listener
+    class CustomTableHook < Redmine::Hook::Listener
       def after_plugins_loaded(context={})
         # redmine_tables plugin patch
         begin
