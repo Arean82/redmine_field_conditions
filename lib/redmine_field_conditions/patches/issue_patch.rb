@@ -1,46 +1,33 @@
+# frozen_string_literal: true
+
 module RedmineFieldConditions
-	module Patches
-		module IssuePatch
-			
-			def self.included(base)
-				base.extend(ClassMethods)
-				base.send :prepend, InstanceMethods
-				base.class_eval do
-				end
-			end
+  module Patches
+    module IssuePatch
+      def self.included(base)
+        base.class_eval do
+          # ✅ Override visible_custom_field_values to respect conditions
+          def visible_custom_field_values(user = nil)
+            values = super(user)
+            return values if User.current.admin?
 
-			module InstanceMethods
+            values.select { |cfv| cfv.custom_field.visible_to?(self) }
+          end
 
-				# TODO IssuePatch: properly override Issue methods from acts_as_customizable
-				# TODO patch the same methods in Redmine::Acts::Customizable in another patch file.
-				# TODO other objects must receive patches to check conditions for show/edit/required custom field values (patching Document, Project ...)
-				
-				# Prepends Issue#visible_custom_field_values
-				def visible_custom_field_values(user=nil)
-			    custom_field_values = super(user)
-			    return custom_field_values if User.current.admin?
+          # TODO: these can be extended later if you want to control editability or required fields dynamically
+          def editable_custom_field_values(user = nil)
+            super(user)
+          end
 
-			    custom_field_values.select do |cfv|
-			    	cfv.custom_field.visible_to?(self)
-			    end
-			  end
+          def required_attribute_names(user = nil)
+            super(user)
+          end
+        end
+      end
+    end
+  end
+end
 
-			  def editable_custom_field_values(user=nil)
-			  	# TODO
-			  	super(user)
-			  end
-
-			  def required_attribute_names(user=nil)
-			  	# TODO
-			  	super(user)
-			  end
-
-			end
-
-			module ClassMethods
-
-			end
-
-		end
-	end
+# ✅ Include only once
+unless Issue.included_modules.include?(RedmineFieldConditions::Patches::IssuePatch)
+  Issue.send(:include, RedmineFieldConditions::Patches::IssuePatch)
 end

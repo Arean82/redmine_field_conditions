@@ -19,6 +19,12 @@ end
 require_dependency 'redmine_field_conditions/hooks/custom_table_hook'
 require_dependency 'redmine_field_conditions/hooks/custom_table_view_hook'
 require_dependency 'redmine_field_conditions/hooks/custom_field_view_hook'
+require_dependency 'redmine_field_conditions/patches/custom_field_patch'
+require_dependency 'redmine_field_conditions/patches/custom_fields_helper_patch'
+require_dependency 'redmine_field_conditions/patches/issue_patch'
+require_dependency 'redmine_field_conditions/patches/custom_table_patch'
+# Apply patches to Redmine classes
+
 
 Rails.configuration.to_prepare do
   CustomField.send :include, RedmineFieldConditions::Patches::CustomFieldPatch

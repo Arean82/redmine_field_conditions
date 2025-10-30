@@ -1,53 +1,47 @@
+# frozen_string_literal: true
+
 module RedmineFieldConditions
-	module Patches
-		module CustomFieldPatch
-			
-			def self.included(base)
-				base.extend(ClassMethods)
-				base.send :prepend, InstanceMethods
-				base.class_eval do
-					include RedmineFieldConditions
-					include RedmineFieldConditions::Utils
-					include RedmineFieldConditions::Validator
-					store :conditions, accessors: [:rules, :expr], coder: JSON
-					safe_attributes 'conditions'
-					validate :validate_field_conditions
-				end
-			end
+  module Patches
+    module CustomFieldPatch
+      def self.included(base)
+        base.class_eval do
+          # Include plugin helper modules
+          include RedmineFieldConditions
+          include RedmineFieldConditions::Utils
+          include RedmineFieldConditions::Validator
 
-			module InstanceMethods
+          # ✅ Store and serialize 'conditions' as JSON
+          store :conditions, accessors: [:rules, :expr], coder: JSON
 
-				# Check if the CustomField (probably a subclass) satisfies
-				# the conditions to be shown
-				# @params {Object} obj An Issue, Document, Project...
-				def visible_to?(obj)
-			    return true if User.current.admin?
-			    case obj
-			    when Issue
-			    	return check_condition(self.conditions, obj)
-			    else
-			    	return true
-			    end
-			  end
+          # ✅ Allow 'conditions' to be saved via safe attributes (Redmine 5+)
+          safe_attributes 'conditions'
 
-			  def editable_to?(obj)
-			  	# TODO
-			  end
+          # ✅ Validate field conditions before saving
+          validate :validate_field_conditions
 
-			  def required_to?(obj)
-			  	# TODO
-			  end
+          # ✅ Define visibility logic (works for Issues and other objects)
+          def visible_to?(obj)
+            return true if User.current.admin?
 
-			  def multiple_to?(obj)
-			  	# TODO
-			  end
+            case obj
+            when Issue
+              check_condition(self.conditions, obj)
+            else
+              true
+            end
+          end
 
-			end
+          # (Optional placeholders for future use)
+          def editable_to?(obj); end
+          def required_to?(obj); end
+          def multiple_to?(obj); end
+        end
+      end
+    end
+  end
+end
 
-			module ClassMethods
-
-			end
-
-		end
-	end
+# Ensure patch is included only once
+unless CustomField.included_modules.include?(RedmineFieldConditions::Patches::CustomFieldPatch)
+  CustomField.send(:include, RedmineFieldConditions::Patches::CustomFieldPatch)
 end
