@@ -21,8 +21,11 @@ module RedmineFieldConditionsHelper
 	end
 
 	def ensure_conditions_initialized
-  		return unless @custom_field
-  		@custom_field.conditions ||= {}
+	  return unless @custom_field
+	  @custom_field.conditions ||= {}
+	  @custom_field.conditions['enabled'] ||= false
+	  @custom_field.conditions['expr']    ||= ''
+	  @custom_field.conditions['rules']   ||= []
 	end
 
 
