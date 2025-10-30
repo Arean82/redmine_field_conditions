@@ -11,30 +11,23 @@ module RedmineFieldConditionsHelper
     ['value', 'getvalue']
   ].freeze
 
-  ##
   # Make sure @custom_field or @custom_table is properly set
-  #
   def set_custom_object
     @custom_field = @custom_table if @custom_table
   end
 
-  ##
   # Determine whether we’re working with a field or table
-  #
   def set_parameter_name
     @param_name = @custom_table ? "custom_table" : "custom_field"
   end
 
-  ##
   # Safely load YAML/JSON/String conditions and normalize into @parsed_conditions (Hash)
-  #
   def ensure_conditions_initialized
     return unless @custom_field
 
     raw = @custom_field.conditions
     parsed = {}
 
-    # Parse YAML or JSON only — never modify original
     if raw.is_a?(Hash)
       parsed = raw
     elsif raw.is_a?(String)
@@ -48,19 +41,15 @@ module RedmineFieldConditionsHelper
       end
     end
 
-    # Normalize to a proper hash with required keys
     parsed = {} unless parsed.is_a?(Hash)
     parsed['enabled'] = !!parsed['enabled']
     parsed['expr']    ||= ''
     parsed['rules']   = Array(parsed['rules'])
 
-    # Keep parsed version for the view
     @parsed_conditions = parsed
   end
 
-  ##
   # Build HTML form for a single condition rule
-  #
   def build_conditions_form(custom_field, rules, rule_index)
     set_parameter_name unless @param_name
     html = ""

@@ -6,66 +6,64 @@ ensure_conditions_initialized
 <hr>
 
 <div id="field_conditions">
-	<%= render partial: "custom_fields/field_conditions" %>
+  <%= render partial: "custom_fields/field_conditions" %>
 </div>
 
 <p>
-	<%= label_tag l("redmine_field_conditions.label_expr") %>
-	<%= text_area_tag "#{@param_name}[conditions][expr]", @parsed_conditions["expr"] %>
+  <%= label_tag l("redmine_field_conditions.label_expr") %>
+  <%= text_area_tag "#{@param_name}[conditions][expr]", @parsed_conditions["expr"] %>
 </p>
 
 <%= button_tag l("redmine_field_conditions.label_button_new_rule"),
-	type: 'button',
-	class: 'icon icon-add',
-	onclick: "add_blank_rule()",
-	name: "#{@param_name}[conditions][button_new_rule]" %>
+  type: 'button',
+  class: 'icon icon-add',
+  onclick: "add_blank_rule()",
+  name: "#{@param_name}[conditions][button_new_rule]" %>
 
 <%= hidden_field_tag "#{@param_name}[cf_id]", @custom_field.id %>
 
 <script type="text/javascript">
-	function submit_conditions(url){
-		var $form = $('#custom_field_form');
-		
-		if ($('#custom_table_form').length > 0){
-			$form = $("#tab-content-general > form");
-			if ($form.length == 0)
-				$form = $('#custom_table_form');
-		}
+function submit_conditions(url){
+  var $form = $('#custom_field_form');
+  
+  if ($('#custom_table_form').length > 0){
+    $form = $("#tab-content-general > form");
+    if ($form.length == 0)
+      $form = $('#custom_table_form');
+  }
 
-		$.ajax({
-			url: url,
-			type: 'post',
-			data: $form.serialize(),
-			complete: toggleDisabledInit
-		}).error(function(jqXHR, textStatus, errorThrown){
-			alert("Oops...)\nErr:\n" + textStatus + "\n" + errorThrown);
-		});
-	}
+  $.ajax({
+    url: url,
+    type: 'post',
+    data: $form.serialize(),
+    complete: toggleDisabledInit
+  }).error(function(jqXHR, textStatus, errorThrown){
+    alert("Oops...)\nErr:\n" + textStatus + "\n" + errorThrown);
+  });
+}
 
-	function edit_field_conditions(callback){
-		submit_conditions('<%= url_for(action: 'edit_custom_field', controller: 'redmine_field_conditions', format: 'js') %>');
-	}
+function edit_field_conditions(callback){
+  submit_conditions('<%= url_for(action: 'edit_custom_field', controller: 'redmine_field_conditions', format: 'js') %>');
+}
 
-	function add_blank_rule(){
-		submit_conditions('<%= url_for(action: 'add_blank_condition', controller: 'redmine_field_conditions', format: 'js') %>');
-	}
+function add_blank_rule(){
+  submit_conditions('<%= url_for(action: 'add_blank_condition', controller: 'redmine_field_conditions', format: 'js') %>');
+}
 
-	function toggle_conditions_form(){
-		var b = ($("input[name='custom_table[tracker_ids][]']:checked").length > 0);
-		$("input, select, button")
-			.filter(function(){ return $(this).prop('name').match(/.*\[conditions\].*/); })
-			.prop('disabled', !b);
-	}
+function toggle_conditions_form(){
+  var b = ($("input[name='custom_table[tracker_ids][]']:checked").length > 0);
+  $("input, select, button")
+    .filter(function(){ return $(this).prop('name').match(/.*\[conditions\].*/); })
+    .prop('disabled', !b);
+}
 
-	$(document).ready(function(){
-		var $ck = $("input[name='custom_table[tracker_ids][]']");
-		if ($ck.length == 0)
-			return;
-
-		$ck.on('change', function(){
-			toggle_conditions_form();
-		});
-
-		toggle_conditions_form();
-	});
+$(document).ready(function(){
+  var $ck = $("input[name='custom_table[tracker_ids][]']");
+  if ($ck.length == 0)
+    return;
+  $ck.on('change', function(){
+    toggle_conditions_form();
+  });
+  toggle_conditions_form();
+});
 </script>
