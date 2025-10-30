@@ -22,15 +22,26 @@ module RedmineFieldConditionsHelper
 
 	def ensure_conditions_initialized
 	  return unless @custom_field
-
-	  # Ensure the base hash exists
+	
+	  # Normalize the conditions structure if it's a String (e.g., YAML or JSON)
+	  if @custom_field.conditions.is_a?(String)
+	    begin
+	      parsed = YAML.safe_load(@custom_field.conditions) rescue JSON.parse(@custom_field.conditions)
+	      @custom_field.conditions = parsed.is_a?(Hash) ? parsed : {}
+	    rescue
+	      @custom_field.conditions = {}
+	    end
+	  end
+	
+	  # If still nil, initialize as empty hash
 	  @custom_field.conditions ||= {}
-
-	  # Ensure default keys exist and are of the correct type
-	  @custom_field.conditions['enabled'] = @custom_field.conditions['enabled'] || false
-	  @custom_field.conditions['expr']    = @custom_field.conditions['expr'] || ''
+	
+	  # Ensure expected keys exist
+	  @custom_field.conditions['enabled'] ||= false
+	  @custom_field.conditions['expr']    ||= ''
 	  @custom_field.conditions['rules']   = Array(@custom_field.conditions['rules'])
 	end
+
 
 
 
