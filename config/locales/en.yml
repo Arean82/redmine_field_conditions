@@ -1,4 +1,3 @@
-# English strings go here for Rails i18n
 en:
   redmine_field_conditions:
     label_enabled: "Conditions"
@@ -9,9 +8,9 @@ en:
     label_rule_val: "Value"
     label_button_new_rule: "New rule"
     label_expr: "Expression"
+    label_no_rules: "No rules defined yet"
     validator:
       uniq_name: "Each rule must have a unique name"
       blank_name: "Rule name cannot be blank"
       space_name: "Rule name cannot contain spaces"
       success: "Conditions saved successfully"
-

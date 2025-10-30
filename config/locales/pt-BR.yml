@@ -8,6 +8,7 @@ pt-BR:
     label_rule_val: Valor
     label_button_new_rule: Nova Regra
     label_expr: Expressão
+    label_no_rules: No rules defined yet
     validator:
       uniq_name: Cada regra deve ter um nome único
       blank_name: O nome da regra não pode ser vazio
