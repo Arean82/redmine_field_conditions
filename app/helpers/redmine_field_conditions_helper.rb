@@ -22,11 +22,16 @@ module RedmineFieldConditionsHelper
 
 	def ensure_conditions_initialized
 	  return unless @custom_field
+
+	  # Ensure the base hash exists
 	  @custom_field.conditions ||= {}
-	  @custom_field.conditions['enabled'] ||= false
-	  @custom_field.conditions['expr']    ||= ''
-	  @custom_field.conditions['rules']   ||= []
+
+	  # Ensure default keys exist and are of the correct type
+	  @custom_field.conditions['enabled'] = @custom_field.conditions['enabled'] || false
+	  @custom_field.conditions['expr']    = @custom_field.conditions['expr'] || ''
+	  @custom_field.conditions['rules']   = Array(@custom_field.conditions['rules'])
 	end
+
 
 
 	def build_conditions_form(custom_field, rules, rule_index)
